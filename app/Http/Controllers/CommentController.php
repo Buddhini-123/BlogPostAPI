@@ -105,4 +105,27 @@ class CommentController extends Controller
             return response()->json(['status' => 500, 'error' => 'Internal Server Error']);
         }
     }
+
+    public function destroy($id)
+    {
+        try {
+            // Check if the user is authenticated
+        if (!auth()->check()) {
+            return response()->json(['status' => 401, 'error' => 'Unauthorized. Invalid or missing token.'], 401);
+        }
+        
+        $post = Comment::where('id', $id)->where('user_id', auth()->user()->id)->delete();
+        if ($post == 1) {
+            return response()->json(['status' => 200, 'success' => 'Comment deleted successfully']);
+        }else{
+            return response()->json(['status' => 404, 'message' => 'No comment available']);
+        }
+        
+        
+        }  catch (\Exception $e) {
+            Log::error('An error occurred: ' . $e->getMessage());
+
+            return response()->json(['status' => 500, 'error' => $e->getMessage()]);
+        }
+    }
 }
