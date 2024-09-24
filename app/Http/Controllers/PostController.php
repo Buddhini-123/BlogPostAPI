@@ -144,4 +144,58 @@ class PostController extends Controller
             return response()->json(['status' => 500, 'error' => $e->getMessage()]);
         }
     }
+
+    public function publishedPosts()
+    {
+        try {
+
+            //get all posts according to the auth user
+            $posts = Post::where('status', 'published')
+                    ->with('comments.user:id,name as commenter')
+                    ->with('user:id,name as author')->get();
+
+            if ($posts) {
+                return response()->json(['status' => 200, 'posts' => $posts]);
+            }else{
+                return response()->json(['status' => 200, 'message' => 'No Posts Available']);
+            }
+            
+
+        } catch (\Throwable $e) {
+            Log::error('An error occurred: ' . $e->getMessage());
+
+            return response()->json(['status' => 500, 'error' => 'Internal Server Error']);
+        }
+    }
+
+    public function search(Request $request)
+    {
+        try {
+            $query = Post::query();
+
+            // Filter by status if provided
+            if ($request->has('status')) {
+                $query->where('status', $request->input('status'));
+            }
+    
+            // Search by title if provided
+            if ($request->has('title')) {
+                $query->where('title', 'LIKE', '%' . $request->input('title') . '%');
+            }
+    
+            $posts = $query->with('comments.user:id,name as commenter')
+                        ->with('user:id,name as author')->get();;
+    
+            if ($posts) {
+                return response()->json($posts);
+            }else{
+                return response()->json(['status' => 200, 'error' => 'No Available Data']);
+            }
+            
+        } catch (\Throwable $e) {
+            Log::error('An error occurred: ' . $e->getMessage());
+
+            return response()->json(['status' => 500, 'error' => $e->getMessage()]);
+        }
+    }
 }

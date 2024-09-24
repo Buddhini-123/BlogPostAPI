@@ -34,7 +34,8 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('posts/{id}', [PostController::class, 'edit']); 
     Route::put('posts/edit/{id}', [PostController::class, 'update']); 
     Route::delete('posts/{id}', [PostController::class, 'destroy']); 
-
+    Route::get('get-published-posts', [PostController::class, 'publishedPosts']);
+    Route::post('search/posts', [PostController::class, 'search']);
     /*
     Comments CRUD
     */
