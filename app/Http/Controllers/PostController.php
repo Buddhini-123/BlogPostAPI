@@ -15,6 +15,7 @@ class PostController extends Controller
     {
         try {
 
+            //get all posts according to the auth user
             $posts = Post::where('user_id', auth()->user()->id)->get();
 
             return response()->json(['status' => 200, 'posts' => $posts]);
@@ -65,11 +66,46 @@ class PostController extends Controller
     {
         try {
 
+            //get the details of requested post
             $post = Post::where('id', $id)->get();
 
             return response()->json(['status' => 200, 'post' => $post]);
 
         } catch (\Throwable $th) {
+            Log::error('An error occurred: ' . $e->getMessage());
+
+            return response()->json(['status' => 500, 'error' => 'Internal Server Error']);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            // Check if the user is authenticated
+        if (!auth()->check()) {
+            return response()->json(['status' => 401, 'error' => 'Unauthorized. Invalid or missing token.'], 401);
+        }
+        
+            $validator = Validator::make($request->all(), [
+                'title' => 'required',
+                'body' => 'required',
+            ]);
+        
+            // Check if validation fails
+            if($validator->fails()){ 
+                return response()->json(['status' => 403, 'error' => $validator->errors()->toArray()]);
+            }
+        
+            //update data to database
+            $post = Post::find($id);
+            $post->title = $request->title;
+            $post->body = $request->body;
+            $post->status = $request->status;
+            $post->save();
+        
+            return response()->json(['status' => 200, 'success' => 'Post updates successfully']);
+        
+        }  catch (\Exception $e) {
             Log::error('An error occurred: ' . $e->getMessage());
 
             return response()->json(['status' => 500, 'error' => 'Internal Server Error']);
