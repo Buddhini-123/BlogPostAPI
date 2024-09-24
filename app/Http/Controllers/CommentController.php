@@ -54,12 +54,48 @@ class CommentController extends Controller
     {
         try {
 
-            //get the details of requested post
-            $comment = Comment::where('id', $commentId)->first();
+            //get the details of requested own comment
+            $comment = Comment::where('id', $commentId)->where('user_id', auth()->user()->id)->first();
 
             return response()->json(['status' => 200, 'comment' => $comment]);
 
         } catch (\Throwable $e) {
+            Log::error('An error occurred: ' . $e->getMessage());
+
+            return response()->json(['status' => 500, 'error' => 'Internal Server Error']);
+        }
+    }
+
+    public function update(Request $request, $commentId)
+    {
+        try {
+            // Check if the user is authenticated
+        if (!auth()->check()) {
+            return response()->json(['status' => 401, 'error' => 'Unauthorized. Invalid or missing token.'], 401);
+        }
+        
+            $validator = Validator::make($request->all(), [
+                'body' => 'required',
+            ]);
+        
+            // Check if validation fails
+            if($validator->fails()){ 
+                return response()->json(['status' => 403, 'error' => $validator->errors()->toArray()]);
+            }
+        
+            //update data to database
+            $comment = Comment::where('id', $commentId)->where('user_id', auth()->user()->id)->first();
+            if($comment){
+                $comment->body = $request->body;
+                $comment->save();
+            
+                return response()->json(['status' => 200, 'success' => 'Comment updated successfully']);
+            }else{
+                return response()->json(['status' => 404, 'error' => 'Comment not found']);
+            }
+            
+        
+        }  catch (\Exception $e) {
             Log::error('An error occurred: ' . $e->getMessage());
 
             return response()->json(['status' => 500, 'error' => 'Internal Server Error']);

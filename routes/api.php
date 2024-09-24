@@ -40,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function() {
     */
     Route::post('comments', [CommentController::class, 'store']);
     Route::get('comments/{comment_id}', [CommentController::class, 'edit']); 
+    Route::put('comments/edit/{comment_id}', [CommentController::class, 'update']); 
 });
 
 
