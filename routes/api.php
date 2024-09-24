@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('login', [LoginController::class, 'login']);
+Route::post('login', [LoginController::class, 'login'])->name('login');
 Route::post('register', [RegisterController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function() {
@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function() {
     Blog Post CRUD
     */
     Route::post('posts', [PostController::class, 'store']); 
+    Route::get('posts', [PostController::class, 'index']); 
 });
 
 

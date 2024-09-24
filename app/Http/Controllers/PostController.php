@@ -14,6 +14,11 @@ class PostController extends Controller
     public function store(Request $request)
     {
         try {
+            // Check if the user is authenticated
+        if (!auth()->check()) {
+            return response()->json(['status' => 401, 'error' => 'Unauthorized. Invalid or missing token.'], 401);
+        }
+        
             $validator = Validator::make($request->all(), [
                 'title' => 'required',
                 'body' => 'required',
