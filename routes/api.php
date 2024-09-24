@@ -28,8 +28,9 @@ Route::middleware('auth:sanctum')->group(function() {
     /*
     Blog Post CRUD
     */
+    Route::get('posts', [PostController::class, 'index']);
     Route::post('posts', [PostController::class, 'store']); 
-    Route::get('posts', [PostController::class, 'index']); 
+    Route::get('posts/{id}', [PostController::class, 'edit']); 
 });
 
 

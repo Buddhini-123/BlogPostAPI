@@ -61,4 +61,18 @@ class PostController extends Controller
         }
     }
 
+    public function edit($id)
+    {
+        try {
+
+            $post = Post::where('id', $id)->get();
+
+            return response()->json(['status' => 200, 'post' => $post]);
+
+        } catch (\Throwable $th) {
+            Log::error('An error occurred: ' . $e->getMessage());
+
+            return response()->json(['status' => 500, 'error' => 'Internal Server Error']);
+        }
+    }
 }
