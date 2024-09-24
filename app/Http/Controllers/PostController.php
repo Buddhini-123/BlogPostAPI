@@ -18,7 +18,12 @@ class PostController extends Controller
             //get all posts according to the auth user
             $posts = Post::where('user_id', auth()->user()->id)->get();
 
-            return response()->json(['status' => 200, 'posts' => $posts]);
+            if ($posts) {
+                return response()->json(['status' => 200, 'posts' => $posts]);
+            }else{
+                return response()->json(['status' => 200, 'message' => 'No Posts Available']);
+            }
+            
 
         } catch (\Throwable $e) {
             Log::error('An error occurred: ' . $e->getMessage());
@@ -68,8 +73,13 @@ class PostController extends Controller
 
             //get the details of requested post
             $post = Post::where('id', $id)->get();
+            if ($post) {
+                return response()->json(['status' => 200, 'post' => $post]);
+            }else{
+                return response()->json(['status' => 404, 'message' => 'No Post Available']);
+            }
 
-            return response()->json(['status' => 200, 'post' => $post]);
+            
 
         } catch (\Throwable $e) {
             Log::error('An error occurred: ' . $e->getMessage());
@@ -121,8 +131,12 @@ class PostController extends Controller
         }
         
         $post = Post::where('id', $id)->delete();
+        if ($post == 1) {
+            return response()->json(['status' => 200, 'success' => 'Post deleted successfully']);
+        }else{
+            return response()->json(['status' => 404, 'message' => 'No post available']);
+        }
         
-        return response()->json(['status' => 200, 'success' => 'Post deleted successfully']);
         
         }  catch (\Exception $e) {
             Log::error('An error occurred: ' . $e->getMessage());

@@ -57,7 +57,11 @@ class CommentController extends Controller
             //get the details of requested own comment
             $comment = Comment::where('id', $commentId)->where('user_id', auth()->user()->id)->first();
 
-            return response()->json(['status' => 200, 'comment' => $comment]);
+            if($comment){
+                return response()->json(['status' => 200, 'comment' => $comment]);
+            }else{
+                return response()->json(['status' => 404, 'message' => 'Not found']);
+            }
 
         } catch (\Throwable $e) {
             Log::error('An error occurred: ' . $e->getMessage());
