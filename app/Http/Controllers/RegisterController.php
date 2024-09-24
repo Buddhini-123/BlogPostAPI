@@ -14,13 +14,13 @@ class RegisterController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => 'required|max:8|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/',
+            'password' => 'required|min:8|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/',
             'c_password' => 'required|same:password',
             'role' => 'required'
         ],
         [
             'password.required' => 'The password field is required.',
-            'password.max' => 'The password may not be greater than :max characters.',
+            'password.min' => 'The password should contain at least 8 characters.',
             'password.regex' => 'The password must contain at least one letter, one number, and one special character (!, $, #, %).',
         ]);
    
@@ -31,7 +31,7 @@ class RegisterController extends Controller
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
-        $success['token'] =  $user->createToken('MyApp')->plainTextToken;
+        $success['remember_token'] =  $user->createToken('MyApp')->plainTextToken;
         $success['name'] =  $user->name;
    
         return response()->json(['status' => 200, 'success' => 'Registration Successfull', 'data' => $success]); 

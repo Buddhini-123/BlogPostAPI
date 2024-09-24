@@ -3,8 +3,40 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Validator;
+use App\Models\Post;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class PostController extends Controller
 {
-    //
+    public function store(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'title' => 'required',
+                'body' => 'required',
+            ]);
+        
+            // Check if validation fails
+            if($validator->fails()){ 
+                return response()->json(['status' => 403, 'error' => $validator->errors()->toArray()]);
+            }
+        
+            $post = new Post();
+            $post->title = $request->title;
+            $post->body = $request->body;
+            $post->status = $request->status;
+            $post->user_id = auth()->user()->id;
+            $post->save();
+        
+            return response()->json(['status' => 200, 'success' => 'Post created successfully']);
+        
+        }  catch (\Exception $e) {
+            Log::error('An error occurred: ' . $e->getMessage());
+
+            return response()->json(['status' => 500, 'error' => $e->getMessage()]);
+        }
+    }
 }
