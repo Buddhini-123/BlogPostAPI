@@ -103,12 +103,31 @@ class PostController extends Controller
             $post->status = $request->status;
             $post->save();
         
-            return response()->json(['status' => 200, 'success' => 'Post updates successfully']);
+            return response()->json(['status' => 200, 'success' => 'Post updated successfully']);
         
         }  catch (\Exception $e) {
             Log::error('An error occurred: ' . $e->getMessage());
 
             return response()->json(['status' => 500, 'error' => 'Internal Server Error']);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            // Check if the user is authenticated
+        if (!auth()->check()) {
+            return response()->json(['status' => 401, 'error' => 'Unauthorized. Invalid or missing token.'], 401);
+        }
+        
+        $post = Post::where('id', $id)->delete();
+        
+        return response()->json(['status' => 200, 'success' => 'Post deleted successfully']);
+        
+        }  catch (\Exception $e) {
+            Log::error('An error occurred: ' . $e->getMessage());
+
+            return response()->json(['status' => 500, 'error' => $e->getMessage()]);
         }
     }
 }
