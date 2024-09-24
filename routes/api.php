@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,11 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('posts/{id}', [PostController::class, 'edit']); 
     Route::put('posts/edit/{id}', [PostController::class, 'update']); 
     Route::delete('posts/{id}', [PostController::class, 'destroy']); 
+
+    /*
+    Comments CRUD
+    */
+    Route::post('comments', [CommentController::class, 'store']);
 });
 
 

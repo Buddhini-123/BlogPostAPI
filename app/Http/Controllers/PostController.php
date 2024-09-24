@@ -20,7 +20,7 @@ class PostController extends Controller
 
             return response()->json(['status' => 200, 'posts' => $posts]);
 
-        } catch (\Throwable $th) {
+        } catch (\Throwable $e) {
             Log::error('An error occurred: ' . $e->getMessage());
 
             return response()->json(['status' => 500, 'error' => 'Internal Server Error']);
@@ -71,7 +71,7 @@ class PostController extends Controller
 
             return response()->json(['status' => 200, 'post' => $post]);
 
-        } catch (\Throwable $th) {
+        } catch (\Throwable $e) {
             Log::error('An error occurred: ' . $e->getMessage());
 
             return response()->json(['status' => 500, 'error' => 'Internal Server Error']);
