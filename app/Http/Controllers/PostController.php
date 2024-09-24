@@ -11,6 +11,21 @@ use Illuminate\Validation\ValidationException;
 
 class PostController extends Controller
 {
+    public function index()
+    {
+        try {
+
+            $posts = Post::where('user_id', auth()->user()->id)->get();
+
+            return response()->json(['status' => 200, 'posts' => $posts]);
+
+        } catch (\Throwable $th) {
+            Log::error('An error occurred: ' . $e->getMessage());
+
+            return response()->json(['status' => 500, 'error' => 'Internal Server Error']);
+        }
+    }
+
     public function store(Request $request)
     {
         try {
@@ -29,6 +44,7 @@ class PostController extends Controller
                 return response()->json(['status' => 403, 'error' => $validator->errors()->toArray()]);
             }
         
+            //save new data to database
             $post = new Post();
             $post->title = $request->title;
             $post->body = $request->body;
@@ -41,7 +57,8 @@ class PostController extends Controller
         }  catch (\Exception $e) {
             Log::error('An error occurred: ' . $e->getMessage());
 
-            return response()->json(['status' => 500, 'error' => $e->getMessage()]);
+            return response()->json(['status' => 500, 'error' => 'Internal Server Error']);
         }
     }
+
 }
