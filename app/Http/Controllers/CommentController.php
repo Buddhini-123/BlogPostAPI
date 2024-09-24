@@ -49,4 +49,20 @@ class CommentController extends Controller
             return response()->json(['status' => 500, 'error' => $e->getMessage()]);
         }
     }
+
+    public function edit($commentId)
+    {
+        try {
+
+            //get the details of requested post
+            $comment = Comment::where('id', $commentId)->first();
+
+            return response()->json(['status' => 200, 'comment' => $comment]);
+
+        } catch (\Throwable $e) {
+            Log::error('An error occurred: ' . $e->getMessage());
+
+            return response()->json(['status' => 500, 'error' => 'Internal Server Error']);
+        }
+    }
 }
