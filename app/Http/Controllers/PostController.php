@@ -152,7 +152,7 @@ class PostController extends Controller
             //get all posts according to the auth user
             $posts = Post::where('status', 'published')
                     ->with('comments.user:id,name as commenter')
-                    ->with('user:id,name as author')->get();
+                    ->with('user:id,name as author')->paginate(10);
 
             if ($posts) {
                 return response()->json(['status' => 200, 'posts' => $posts]);
