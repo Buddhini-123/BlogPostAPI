@@ -76,7 +76,7 @@ class PostController extends Controller
             if ($post) {
                 return response()->json(['status' => 200, 'post' => $post]);
             }else{
-                return response()->json(['status' => 404, 'message' => 'No Post Available']);
+                return response()->json(['status' => 200, 'message' => 'No Post Available']);
             }
 
             
@@ -129,14 +129,27 @@ class PostController extends Controller
         if (!auth()->check()) {
             return response()->json(['status' => 401, 'error' => 'Unauthorized. Invalid or missing token.'], 401);
         }
-        
-        $post = Post::where('id', $id)->delete();
-        if ($post == 1) {
-            return response()->json(['status' => 200, 'success' => 'Post deleted successfully']);
-        }else{
-            return response()->json(['status' => 404, 'message' => 'No post available']);
+
+        // Get the post
+        $post = Post::find($id);
+
+        if (!$post) {
+            return response()->json(['status' => 404, 'error' => 'Post not found'], 404);
         }
-        
+
+        // Check if the user is an admin
+        $user = auth()->user();
+        if ($user->role === 'admin') {
+            // Admins can delete any post
+            $post->delete();
+            return response()->json(['status' => 200, 'success' => 'Post deleted successfully']);
+        } elseif ($user->id === $post->user_id) {
+            // Regular users can only delete their own posts
+            $post->delete();
+            return response()->json(['status' => 200, 'success' => 'Post deleted successfully']);
+        } else {
+            return response()->json(['status' => 403, 'error' => 'You are not authorized to delete this post'], 403);
+        }
         
         }  catch (\Exception $e) {
             Log::error('An error occurred: ' . $e->getMessage());

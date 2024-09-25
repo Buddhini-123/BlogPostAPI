@@ -60,7 +60,7 @@ class CommentController extends Controller
             if($comment){
                 return response()->json(['status' => 200, 'comment' => $comment]);
             }else{
-                return response()->json(['status' => 404, 'message' => 'Not found']);
+                return response()->json(['status' => 200, 'message' => 'Not found']);
             }
 
         } catch (\Throwable $e) {
@@ -95,7 +95,7 @@ class CommentController extends Controller
             
                 return response()->json(['status' => 200, 'success' => 'Comment updated successfully']);
             }else{
-                return response()->json(['status' => 404, 'error' => 'Comment not found']);
+                return response()->json(['status' => 200, 'error' => 'Comment not found']);
             }
             
         
@@ -114,11 +114,25 @@ class CommentController extends Controller
             return response()->json(['status' => 401, 'error' => 'Unauthorized. Invalid or missing token.'], 401);
         }
         
-        $post = Comment::where('id', $id)->where('user_id', auth()->user()->id)->delete();
-        if ($post == 1) {
+        // Get the comment
+        $comment = Comment::find($id);
+
+        if (!$comment) {
+            return response()->json(['status' => 404, 'error' => 'Comment not found'], 404);
+        }
+
+        // Check if the user is an admin
+        $user = auth()->user();
+        if ($user->role === 'admin') {
+            // Admins can delete any comment
+            $comment->delete();
             return response()->json(['status' => 200, 'success' => 'Comment deleted successfully']);
-        }else{
-            return response()->json(['status' => 404, 'message' => 'No comment available']);
+        } elseif ($user->id === $comment->user_id) {
+            // Regular users can only delete their own comments
+            $comment->delete();
+            return response()->json(['status' => 200, 'success' => 'Comment deleted successfully']);
+        } else {
+            return response()->json(['status' => 403, 'error' => 'You are not authorized to delete this post'], 403);
         }
         
         
