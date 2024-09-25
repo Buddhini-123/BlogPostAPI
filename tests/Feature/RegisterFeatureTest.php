@@ -52,21 +52,19 @@ class RegisterFeatureTest extends TestCase
 
     public function test_register_with_existing_email()
     {
-        User::factory()->create(['email' => 'john@example.com']);
+        User::factory()->create(['email' => 'test@example.com',]);
 
         $response = $this->postJson('/api/register', [
-            'name' => 'John Doe',
-            'email' => 'john@example.com', 
+            'name' => 'Another User',
+            'email' => 'test@example.com', // Existing email
             'password' => 'Password123!',
             'c_password' => 'Password123!',
             'role' => 'user'
         ]);
 
-        $response->assertStatus(403)
-                 ->assertJsonStructure([
-                    'status',
-                    'error' => ['email']
-                 ]);
+        // Assert that the response status is 403
+        $response->assertStatus(403);
+        $response->assertJsonStructure(['status', 'error' => ['email']]);
     }
 
     public function test_successful_registration_returns_token()
